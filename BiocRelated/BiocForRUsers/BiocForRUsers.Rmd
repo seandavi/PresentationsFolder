@@ -1,0 +1,265 @@
+---
+title: "Habits"
+author: John Doe
+date: March 22, 2005
+output: revealjs::revealjs_presentation
+
+---
+
+# What is Bioconductor?
+
+```{r setup, echo=FALSE, messages=FALSE, warnings=FALSE}
+suppressPackageStartupMessages({
+    library(airway)
+    library(DESeq2)
+    library(ggplot2)
+    library(org.Hs.eg.db)
+    library(knitr)
+})
+options(width=50)
+opts_chunk$set(cache=TRUE)
+```
+
+---
+
+## Physically
+
+- Collection of 1200+ R packages.
+- Web site (http://bioconductor.org) for package distribution and
+  other resources.
+- Support site (https://support.bioconductor.org) for user questions.
+
+## Conceptually
+
+- Tools for the analysis and comprehension of high-throughput genomic data.
+- Built on the R statistical programming language, and is open source and open development.
+
+# Core principles
+
+## High-throughput analysis needs statistics!
+
+
+- Volume of data
+
+- Type of research question
+    * Designed experiments
+    * Population samples
+    * ...
+
+- Technological artifacts
+    * Differences in sequencing depth between samples
+    * Bias in the genomic regions sampled
+
+---
+
+## Scientific research needs to be reproducible
+
+- Cisplatin-resistant non-small-cell lung cancer gene sets
+- Hsu et al. 2007 J Clin Oncol 25:
+  [4350-4357](http://jco.ascopubs.org/content/25/28/4350.abstract)
+  [retracted](http://jco.ascopubs.org/content/28/35/5229.long)
+
+  ![](our_figures/HsuEtAl-F1-large-a.jpg)
+
+---
+
+## Scientific research needs to be reproducible
+
+- Baggerly & Coombes 2009 Ann Appl Stat
+  [3: 1309-1334](http://projecteuclid.org/DPubS?service=UI&version=1.0&verb=Display&handle=euclid.aoas/1267453942)
+
+  ![](our_figures/BaggerlyCoombes2009-fig2a.jpg)
+
+---
+
+## Lessons
+
+- Record each step of the analysis
+- Coordinated manipulation of feature, sample, and assay data
+- Informative labels on visualizations
+- Rely on interoperability to the maximum extent possible to reduce data munging
+
+---
+
+## How to be reproducible?
+
+- Use "safe" software 'objects' that take care of some of the tedious
+  book-keeping
+  - Bioconductor based largely on [S4 classes](http://adv-r.had.co.nz/S4.html)
+- Document our analysis in scripts and 'markdown' documents
+- Version and version control everything
+   - Software
+   - Data
+   - External resources and data
+
+---
+
+## Safe software using objects
+
+```{r, results='hide',tidy=TRUE}
+setClass("Person", representation(name = "character", age = "numeric"))
+setClass("Employee", representation(boss = "Person"), contains = "Person")
+setGeneric("age", function(object) {
+  standardGeneric("age")
+})
+setMethod("age", signature(object = "Person"), function(object) {
+  object@age
+})
+```
+
+```{r}
+ana <- new("Person", name="Ana", age=14)
+age(ana)
+# does not work--why?
+# sean <- new("Employee", name="Sean", boss="Ana", age=45)
+sean <- new("Employee", name="Sean", boss=ana, age=45)
+age(sean)
+```
+---
+
+## Example: A SummarizedExperiment
+
+![](our_figures/SE_Description.png)
+
+---
+
+## A SummarizedExperiment
+
+Bioconductor contains data packages that capitalize on these rich data objects.
+
+```{r message=FALSE,warning=FALSE}
+library(SummarizedExperiment)
+library(airway)
+data(airway)
+airway
+```
+--- 
+
+## Underlying data is a matrix
+
+- Regions of interest (e.g., genes) x samples
+- `assay()` -- e.g., matrix of counts of reads overlapping genes
+
+```{r}
+head(assay(airway),3)
+```
+---
+
+## Include information about rows
+
+- `rowRanges()` -- gene identifiers, or _genomic ranges_ describing
+  the coordinates of each gene
+
+```{r}
+rowRanges(airway)
+```
+---
+
+## Include information about columns
+
+- `colData()` -- describing samples, experimental design, ...
+```{r}
+colData(airway)
+```
+---
+
+# Software reuse: We can 'stand on the shoulders of giants'
+
+## Packages!
+
+- [biocViews](http://bioconductor.org/packages/)
+- Vignettes
+- [Workflows](https://www.bioconductor.org/help/workflows/)
+- [Course material and tutorials](https://www.bioconductor.org/help/course-materials/)
+
+# Explore our data
+
+R facilitates exploring our data interactively
+
+---
+
+## Visualization
+
+```{r fig.height=6,warning=FALSE,message=FALSE,eval=FALSE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+as.data.frame(log2(assay(airway)+1)) %>%
+    gather() %>%
+    filter(value>1) %>%
+    ggplot(aes(value,group=key,color=key)) + geom_density()
+```
+
+## Visualization
+
+```{r fig.height=6,warning=FALSE,message=FALSE,echo=FALSE}
+library(ggplot2)
+library(tidyr)
+library(dplyr)
+as.data.frame(log2(assay(airway)+1)) %>%
+    gather() %>%
+    filter(value>1) %>%
+    ggplot(aes(value,group=key,color=key)) + geom_density()
+```
+
+---
+
+### Inter-operability between packages
+
+- Made easier by using similar data structures
+
+---
+
+### Examples 
+
+- `SummarizedExperiment`
+- `DNAStringSet`
+- `GenomicRanges`
+- `ExpressionSet`
+
+---
+
+## Comprehension is more than statistical analysis
+
+---
+
+### External Data Resources
+
+- Large-scale genomics databases 
+```{r message=FALSE, warning=FALSE}
+library(GEOquery)
+gse = getGEO('gse2553')[[1]]
+gse
+```
+---
+
+### Additional resources
+
+- Mapping from technical to user-friendly identifiers
+- Assigning genes to pathways
+- Placing our results in the context of large-scale analyses
+- APIs
+- Database connections
+
+
+### Data products
+
+Easily produce high-quality, rich data products
+
+- Rmarkdown documents (literate programming)
+- R data packages
+- Shiny applications
+
+# Future work
+
+## On the Radar
+
+- Out-of-memory architectures
+- Distributed computing approaches
+- Spark, Dataflow/Beam
+- Data packages and data commons
+- Data lake approaches in collaboration with data repositories
+
+# Thanks!
+
+
