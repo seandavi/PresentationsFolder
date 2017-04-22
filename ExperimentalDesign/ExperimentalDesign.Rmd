@@ -1,0 +1,95 @@
+---
+title: "Thoughts on Experimental Design and Reproducible Research"
+author: "Sean Davis, MD, PhD<br/>Center for Cancer Research, National Cancer Institute<br>National Institutes of Health
+<br/>https://twitter.com/seandavis12<br/>https://seandavi.github.io/"
+subtitle: "A Guided Discussion"
+date: "`r Sys.Date()`"
+output: 
+  ioslides_presentation:
+    widescreen: TRUE
+    df_print: kable
+    smart: TRUE
+bibliography: citations.bib
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+## Scientific Method
+
+## Deciding on an Experimental Question
+
+## Ethical Considerations
+Ethical considerations are integral to the initiation, conduct, and publication of experimental results.  In terms of experimental design, consider the following *3Rs* [@Fry2014-wu].
+
+- Replacement
+
+- Refinement
+
+- Reduction
+
+## Ethical Considerations
+
+### Replacement
+Does the experiment need to be performed at all or performed as envisioned?
+
+- Literature review
+    - Has the study already been done?
+    - What designs have been used or proposed for similar experiments in the past?
+- Are the experimental materials appropriate for the questions at hand?
+    - Cell lines useful instead of animals
+    - Low cost tech instead of high cost (PCR vs. Sequencing)
+
+## Ethical Considerations
+
+### Refinement
+Does the experiment as envisioned gather appropriate data, have defined stopping rules, standard procedures, and clarity on sources of variability?
+
+- Define important data to gather.
+    - Dependent variables and independent variables may not be enough.
+    - Consider confounders, technical details, ambient conditions, and metadata (date, time, machine, experimenter, etc.).
+- Define when an experiment is "complete". 
+- Establish standard procedures as clearly as possible.
+- Define, to the extent possible, sources of variability and reliability in your approach.
+
+
+## Overview
+
+- Introductions
+- Experimental Design
+  
+- Reproducible Computational Research Principles
+- 
+
+
+
+## R Markdown
+
+This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+
+## Slide with Bullets
+
+- Bullet 1
+- Bullet 2
+- Bullet 3
+
+## Slide with R Output
+
+```{r cars, echo = TRUE}
+summary(cars)
+```
+
+# subtitle
+
+Just a test.
+
+## Slide with Plot
+
+```{r pressure}
+plot(pressure)
+```
+
+## References {.smaller}
