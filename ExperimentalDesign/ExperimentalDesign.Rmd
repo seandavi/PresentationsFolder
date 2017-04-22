@@ -53,43 +53,34 @@ Does the experiment as envisioned gather appropriate data, have defined stopping
 - Establish standard procedures as clearly as possible.
 - Define, to the extent possible, sources of variability and reliability in your approach.
 
+## Ethical Considerations
 
-## Overview
+### Reduction (or is the experiment right-sized)
+Can the experiment provide reasonable results with the resources proposed?
 
-- Introductions
-- Experimental Design
-  
-- Reproducible Computational Research Principles
-- 
+- Is sample size appropriate?
+- Are resources allocated appropriately?
+- Are data sources not directly produced by the experiment included?
+- Meta-analysis appropriate?
 
+## Why design?
 
+- To obtain valid results *from which safe and meaningful conclusions can be drawn*
+- To know the extent to which results can be generalized
+- To use resources efficiently
+    - Overpowering (using more than required resources) and, to a greater extent, underpowering can be very costly.
 
-## R Markdown
+# Basic Principles of Experimental Design
 
-This is an R Markdown presentation. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+## Controls
 
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document.
+## Replication
 
-## Slide with Bullets
+## Randomization and Avoidance of Bias
 
-- Bullet 1
-- Bullet 2
-- Bullet 3
+## The Experimental Unit
 
-## Slide with R Output
-
-```{r cars, echo = TRUE}
-summary(cars)
-```
-
-# subtitle
-
-Just a test.
-
-## Slide with Plot
-
-```{r pressure}
-plot(pressure)
-```
+[@Fisher-1960]
+[@Lazic2010-aa] pseudoreplication
 
 ## References {.smaller}
