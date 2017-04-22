@@ -1,0 +1,11 @@
+name: "my-website"
+navbar:
+  title: "My Website"
+  left:
+    - text: "Home"
+      href: index.html
+    - text: "abc"
+      href: ExperimentalDesign/ExperimentalDesign.html
+output:
+  html_document:
+    theme: cosmo

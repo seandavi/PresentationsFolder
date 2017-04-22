@@ -1,0 +1,213 @@
+---
+title: "Biowulf Usage Report"
+author: "Sean Davis"
+date: "May 18, 2015"
+output: ioslides_presentation
+---
+
+```{r init,echo=FALSE,results='hide'}
+library(knitr)
+opts_chunk$set(warning=FALSE,message=FALSE,cache=TRUE,
+               fig.align='center',fig.width=8,echo=FALSE)
+xlsFile = '~/Downloads/NCI.xls'
+xlsFileOld = '~/Downloads/NCI (1).xls'
+```
+
+```{r readData}
+readStorage = function(fnames) {
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  ret = do.call(rbind,lapply(fnames,function(x) {
+    read_excel(x,sheet="Storage",skip=3) %>%
+      gather(Month,MB,-PI) %>% 
+      transform(Month=as.Date(paste(Month,'01',sep='-'),'%Y-%m-%d')) %>%
+      transform(MB=as.integer(MB))
+  }))
+  ret = group_by(ret,PI,Month) %>%
+    summarize(MB=mean(MB))
+  ret = arrange(ret,Month)
+  return(ret)
+}
+readCPUHours = function(fnames) {
+  library(readxl)
+  library(dplyr)
+  library(tidyr)
+  ret = do.call(rbind,lapply(fnames, function(x) {
+    nciccr  = read_excel(x,sheet='Biowulf-CCR',skip=3) %>% 
+      gather(Month,CPUHours,-PI) %>% 
+      transform(Month=as.Date(paste(Month,'01',sep='-'),'%Y-%m-%d')) %>%
+      transform(CPUHours=as.integer(CPUHours)) %>%
+      mutate(pool='CCR') %>% 
+      filter(CPUHours>0)
+    ncimain = read_excel(x,sheet='Biowulf-MF',skip=3) %>% 
+      gather(Month,CPUHours,-PI) %>% 
+      transform(Month=as.Date(paste(Month,'01',sep='-'),'%Y-%m-%d')) %>%
+      transform(CPUHours=as.integer(CPUHours)) %>%
+      mutate(pool='Main') 
+    cpuhours = rbind(ncimain,nciccr)
+    return(cpuhours)
+  }))
+  ret = group_by(ret,PI,Month,pool) %>%
+    summarize(CPUHours=mean(CPUHours))
+  return(ret)
+}
+cpuhours = readCPUHours(c('~/Downloads/NCI.xls','~/Downloads/NCI (1).xls'))
+storage  = readStorage(c('~/Downloads/NCI.xls','~/Downloads/NCI (1).xls'))
+```
+
+# Biowulf Utilization
+
+## Storage Growth
+
+```{r storageGrowth}
+library(ggplot2)
+ggplot(storage,aes(x=Month,y=MB)) + 
+  geom_bar(stat='identity') + 
+  ggtitle('Biowulf Storage')
+```
+
+## Storage by PI
+
+```{r storageByLab}
+ggplot(filter(storage,MB>15000),aes(x=Month,y=MB,color=PI)) + 
+  geom_line() + geom_point() + 
+  scale_y_log10() + 
+  ggtitle('Biowulf Storage by PI')
+```
+
+## Compute Usage 
+
+```{r CPUHoursByPool}
+ggplot(cpuhours,aes(x=Month,y=CPUHours,fill=pool)) + 
+  geom_bar(stat="identity") + 
+  ggtitle('NCI Biowulf Compute Usage by Node Pool')
+```
+
+## Compute Usage, CCR nodes only
+
+```{r ccrCPUHours}
+ggplot(filter(cpuhours,pool=='CCR'),aes(x=Month,y=CPUHours)) + 
+  geom_bar(stat="identity") + ggtitle('Biowulf Compute Usage')
+```
+
+## Compute Usage by PI
+
+```{r ccrPICPUHours}
+ggplot(filter(cpuhours,pool=='CCR'),aes(x=Month,y=CPUHours,color=PI)) + 
+  geom_line() + geom_point() + scale_y_log10() + ggtitle('Biowulf Compute Usage by PI')
+```
+
+## Compute Usage by PI
+
+```{r ccrPICPUTotals}
+ggplot(filter(cpuhours,pool=='CCR') %>% group_by(PI) %>% summarize(CPUHours=sum(CPUHours)),aes(x=PI,y=CPUHours)) + 
+  geom_bar(stat='identity') + scale_y_log10() + ggtitle('Biowulf Compute Usage by PI') + theme(axis.text.x = element_text(angle = 45, hjust=1))
+
+```
+
+
+## Compute Usage Trend by PI
+
+```{r ccrPICPUHoursTrend}
+ggplot(filter(cpuhours,pool=="CCR",
+              Month %in% c(as.Date('2014-07-01'), as.Date('2015-03-01'))),
+       aes(x=Month,y=CPUHours,color=PI)) + 
+  geom_line() + 
+  scale_y_log10() + 
+  ggtitle('Trend in Biowulf Compute Usage')
+```
+
+# Biowulf Expansion
+
+## High-level Expansion Plans
+
+* NIH Network implementation (in progress)
+* Remodel data center to allow expansion (complete)
+* New network implementation in the data center (nearly complete)
+* Biowulf2 hardware installation, phase I (complete)
+* Software testing and batch system redesign (nearly complete)
+
+## By the Numbers
+
+```{r expansionNumbers}
+x = data.frame(Year=c(2014,2015,2016,2017,2018),
+               'Storage (PB)'=c(2.9,3.9,6.9,9.9,12.9),
+               'Cores' = c(18494,23445,53445,83445,96000),
+               'CCR Nodes' = c(7000,10000,6000,3000,3000),
+               'CCR Storage (PB)' = c(0,1.2,1.2,1.7,2.2),
+               check.names=FALSE)
+knitr::kable(x)
+```
+
+CCR nodes assume 3-year "lease" business model
+
+* CCR helix node for educational use and interactive work
+
+## Near Term Plan
+
+* Ongoing software installation and testing
+* May 27: Beta testers meeting and access available
+* July: Open to general users
+* New website created--live in July
+* Transition older nodes (Summer)
+* Transition GPFS storage system (Summer)
+* Add Cleversafe storage system (Summer)
+* Transfer nodes available (partially complete)
+
+## User Transition
+
+* Lipsett announcement planned prior to going live
+* Three training sessions planned
+* NCI training and communication
+
+## So What?
+
+* New batch system will mean more efficient use of resources
+* New network internally means faster genomics processing (marginal)
+* New NIH network brings possibilities for data management not currently possible
+* More nodes means shorter wait times and more computing cycles
+* Larger, more capable nodes designed to be dual-purpose
+    * Genomics
+    * Molecular dynamics
+* Strategic plan includes hiring new talent--first already on board
+
+# Other Projects
+
+## Other Projects
+
+* NCI Cloud pilots (CBIIT, CCR/DCEG, Bioconductor)
+* NCI Genomic Data Commons (OCG)
+* NCI Linux Desktop pilot (CBIIT, NCI)
+* CCR Data Lake (CBIIT, CCR, ?CIT)
+* Data Science Trainig and Education (ADDS, NIH Library, NCBI)
+    * Hackathon, August 2015 (NCBI)
+    * MOOC, Fall 2015 (NCBI)
+    * Software Carpentry (ADDS)
+    * Training and Education Calendar (ADDS, NCBI, NIH Library)
+
+## Other Projects (cont.)
+
+* Cloud Services
+    * Amazon Web Services (Leidos, CBIIT)
+    * Google Genomics (Bioconductor)
+    * Microsoft Azure (CBIIT)
+* CBIIT Strategic Planning (CBIIT, Bioteam)
+* Genomic Data Sharing Policy Implementation (CCR, DCEG, extramural NCI, NIH OD)
+
+# Questions?
+
+  <script type="text/javascript">
+
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-2851481-1']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+    var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+    ga.src = ('https:' == document.location.protocol ? 'https://' : 'http://') + 'stats.g.doubleclick.net/dc.js';
+    var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+
+  </script>
+  
