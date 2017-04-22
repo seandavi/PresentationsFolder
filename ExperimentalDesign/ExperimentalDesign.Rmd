@@ -18,6 +18,14 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ## Scientific Method
 
+![](experimental-cycle.png)
+
+## Scientific Method
+
+```{r out.height="500px",out.width="600px"}
+knitr::include_graphics("project.png")
+```
+
 ## Deciding on an Experimental Question
 
 ## Ethical Considerations
@@ -82,5 +90,27 @@ Can the experiment provide reasonable results with the resources proposed?
 
 [@Fisher-1960]
 [@Lazic2010-aa] pseudoreplication
+
+# Design and Analysis
+
+## *Know* how the results will be analyzed
+
+## Signal/noise ratio
+
+## Sources of variability and reducing them
+
+## Blocking
+
+## Quantify variability
+
+- Population vs sample
+- Standard Deviation
+- Standard Error
+
+## Generalizability
+
+
+
+## 
 
 ## References {.smaller}
