@@ -20,6 +20,8 @@ knitr::opts_chunk$set(echo = FALSE)
 
 ![](experimental-cycle.png)
 
+http://blog.findingsapp.com/posts/what-is-an-experiment.html
+
 ## Scientific Method
 
 ```{r out.height="500px",out.width="600px"}
