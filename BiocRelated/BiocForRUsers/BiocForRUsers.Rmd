@@ -1,7 +1,7 @@
 ---
-title: "Habits"
-author: John Doe
-date: March 22, 2005
+title: "Bioconductor: A discussion for General R Users"
+author: Sean Davis
+date: '`r Sys.Date()`'
 output: revealjs::revealjs_presentation
 
 ---
