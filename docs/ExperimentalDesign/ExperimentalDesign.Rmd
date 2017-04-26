@@ -7,13 +7,12 @@ date: "`r Sys.Date()`"
 output: 
   ioslides_presentation:
     widescreen: TRUE
-    df_print: kable
     smart: TRUE
 bibliography: citations.bib
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE)
+#knitr::opts_chunk$set()
 ```
 
 ## Scientific Method
@@ -24,7 +23,7 @@ http://blog.findingsapp.com/posts/what-is-an-experiment.html
 
 ## Scientific Method
 
-```{r out.height="500px",out.width="600px"}
+```{r out.height="500px",out.width="600px",echo=FALSE}
 knitr::include_graphics("project.png")
 ```
 
@@ -80,13 +79,194 @@ Can the experiment provide reasonable results with the resources proposed?
 - To use resources efficiently
     - Overpowering (using more than required resources) and, to a greater extent, underpowering can be very costly.
 
+# Hypothesis testing
+
+## The Normal distribution
+
+```{r echo=TRUE}
+x = rnorm(10)
+mean(x)
+sum(x)/length(x)
+sd(x)
+```
+
+## The Normal Distribution
+
+```{r}
+plot(x)
+```
+
+## The Normal Distribution
+
+```{r}
+x = rnorm(1000)
+hist(x)
+```
+
+## Students t-distribution
+
+Represents the distribution of the estimate of the mean of a normal distribution when the mean is small.
+
+```{r}
+rn3 = sapply(1:100,function(x) return(mean(rnorm(3))))
+rn20 = sapply(1:100,function(x) return(mean(rnorm(20))))
+summary(rn3)
+summary(rn20)
+```
+
+## Students t-distribution
+
+- Two distributions of the mean of our "population"
+    - One with 20 samples
+    - One with 3 samples
+
+```{r eval=FALSE}
+plot(density(rn20),col='blue',xlim=c(-2,2))
+lines(density(rn3),col='red')
+```
+
+## Students t-distribution
+
+```{r echo=FALSE}
+plot(density(rn20),col='blue',xlim=c(-2,2))
+lines(density(rn3),col='red')
+```
+
+## Two groups -- Population distribution
+
+
+```{r}
+g1 = rnorm(10000,1)
+g2 = rnorm(10000,0)
+```
+
+```{r eval=FALSE}
+plot(density(g1),col='blue',xlim=c(-4,5))
+lines(density(g2),col='red')
+```
+## Two groups -- Population distribution
+
+```{r echo=FALSE}
+plot(density(g1),col='blue',xlim=c(-4,5))
+lines(density(g2),col='red')
+```
+
+## Two groups -- estimate of mean
+
+What distribution do we use to estimate the mean?
+
+```{r}
+g1_3 = sapply(1:100,function(x) return(mean(rnorm(3))))
+g2_3 = sapply(1:100,function(x) return(mean(rnorm(3,1))))
+```
+
+```{r}
+g1_20 = sapply(1:100,function(x) return(mean(rnorm(20))))
+g2_20 = sapply(1:100,function(x) return(mean(rnorm(20,1))))
+```
+
+## Two groups -- estimate of mean
+
+```{r echo=FALSE}
+plot(density(g1_20),xlim=c(-2,3),col='red')
+lines(density(g2_20),col='red')
+lines(density(g1_3),col='blue')
+lines(density(g2_3),col='blue')
+```
+
+## Effects of population "spread" or standard devation
+
+```{r}
+g1 = rnorm(10000,1,2)
+g2 = rnorm(10000,0,2)
+```
+
+```{r eval=FALSE}
+plot(density(g1),col='blue',xlim=c(-4,5))
+lines(density(g2),col='red')
+```
+
+## Two groups -- Population distribution
+
+```{r echo=FALSE}
+plot(density(g1),col='blue',xlim=c(-4,5))
+lines(density(g2),col='red')
+```
+
+## Two groups -- wider population spread
+
+What distribution do we use to estimate the mean?
+
+```{r}
+g1_3 = sapply(1:100,function(x) return(mean(rnorm(3,0,2))))
+g2_3 = sapply(1:100,function(x) return(mean(rnorm(3,1,2))))
+```
+
+```{r}
+g1_20 = sapply(1:100,function(x) return(mean(rnorm(20,0,2))))
+g2_20 = sapply(1:100,function(x) return(mean(rnorm(20,1,2))))
+```
+
+## Two groups -- wider population spread
+
+```{r echo=FALSE}
+plot(density(g1_20),xlim=c(-2,3),col='red')
+lines(density(g2_20),col='red')
+lines(density(g1_3),col='blue')
+lines(density(g2_3),col='blue')
+```
+
+## Power
+
+*Power* is the statistical probability that a test will reject the null hypothesis when the null hypothesis is *actually false*.
+
+```{r}
+install.packages('pwr')
+# d is the "effect size"
+pwr.t.test(n=10,d=1)
+```
+
 # Basic Principles of Experimental Design
 
 ## Controls
 
 ## Replication
 
+- Need estimates of centrality (mean) AND spread (variance)
+
 ## Randomization and Avoidance of Bias
+
+- No batch effect
+
+$$ y_i = \beta_1X_{1,i} + \epsilon$$
+
+$\beta_1$ is the estimate of the mean (or difference of means) of treatment. 
+
+- One "batch"
+
+$$ y_i = \beta_1X_{1,i} + \beta_2X_{2,i} + \epsilon$$
+
+$\beta_1$ is the estimate of the mean (or difference of means) of treatment. 
+$\beta_2$ is the estimate of the mean of the batches. 
+
+
+## Randomization and Avoidance of Bias
+
+```{r}
+df = data.frame(expression=rnorm(12),
+                treatment = rep(c(0,0,0,1,1,1),2),
+                batch = c(rep(0,6),rep(1,6)))
+df
+```
+
+## Randomization and Avoidance of Bias
+
+```{r}
+df = data.frame(expression=rnorm(12),
+                treatment = c(0,0,0,0,0,1,1,1,1,1,1,0),
+                batch = c(rep(0,6),rep(1,6)))
+df
+```
 
 ## The Experimental Unit
 
